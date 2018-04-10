@@ -1,0 +1,200 @@
+package com.sramanujamn.sgbus.sgnextbus.data;
+
+import android.annotation.TargetApi;
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+public class BusProvider extends ContentProvider {
+
+    private static final String TAG = BusProvider.class.getSimpleName();
+
+    public static final int CODE_ALL_BUSSTOPS = 300;
+    public static final int CODE_BUSSTOPS_WITH_SEARCHSTRING = 303;
+
+    public static final int CODE_ALL_BUSSERVICES = 500;
+    public static final int CODE_BUSSERVICES_WITH_SEARCHSTRING = 503;
+
+    private static final String PERCENTAGE = "%";
+
+    public static final UriMatcher sUriMatcher = buildUriMatcher();
+    private BusDBHelper busDBHelper;
+
+
+    private static UriMatcher buildUriMatcher() {
+
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = BusContract.CONTENT_AUTHORITY;
+
+        matcher.addURI(authority, BusContract.PATH_BUSSTOPS, CODE_ALL_BUSSTOPS);
+
+        matcher.addURI(authority, BusContract.PATH_BUSSTOPS + "/*", CODE_BUSSTOPS_WITH_SEARCHSTRING);
+
+        matcher.addURI(authority, BusContract.PATH_BUSSERVICES, CODE_ALL_BUSSERVICES);
+
+        matcher.addURI(authority, BusContract.PATH_BUSSERVICES + "/*", CODE_BUSSERVICES_WITH_SEARCHSTRING);
+
+        return matcher;
+    }
+
+    @Override
+    public boolean onCreate() {
+        busDBHelper = new BusDBHelper(getContext());
+        Log.v(TAG, "Inside onCreate()");
+        return true;
+    }
+
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        final SQLiteDatabase db = busDBHelper.getWritableDatabase();
+        int rowsInserted = 0;
+
+        switch(sUriMatcher.match(uri)) {
+            case CODE_ALL_BUSSTOPS:
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+                    for(ContentValues value : values) {
+                        long _id = db.insert(BusContract.BusStopsEntry.TABLE_NAME, null, value);
+                        if(_id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if(rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsInserted;
+
+            case CODE_ALL_BUSSERVICES:
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+                    for(ContentValues value : values) {
+                        long _id = db.insert(BusContract.BusServicesEntry.TABLE_NAME, null, value);
+                        if(_id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if(rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsInserted;
+
+
+            default:
+                return super.bulkInsert(uri, values);
+        }
+    }
+
+    @Nullable
+    @Override
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectorArgs, @Nullable String sortOrder) {
+        Cursor cursor;
+        int match = sUriMatcher.match(uri);
+        String resultsLimit = "0, 5";
+        String[] selectionArguments;
+        String selectionCriteria;
+
+        switch (match) {
+            case CODE_BUSSTOPS_WITH_SEARCHSTRING:
+                String busStopSearchString = PERCENTAGE + uri.getLastPathSegment() + PERCENTAGE;
+                selectionArguments = new String[] {busStopSearchString, busStopSearchString};
+                selectionCriteria = BusContract.BusStopsEntry.COLUMN_BUSSTOPCODE + " LIKE ? OR " + BusContract.BusStopsEntry.COLUMN_DESCRIPTION + " LIKE ? ";
+                Log.v(TAG, selectionCriteria);
+
+                cursor = busDBHelper.getReadableDatabase().query(
+                        BusContract.BusStopsEntry.TABLE_NAME,
+                        projection,
+                        selectionCriteria,
+                        selectionArguments,
+                        null,
+                        null,
+                        sortOrder, resultsLimit
+                );
+                break;
+
+            case CODE_ALL_BUSSTOPS:
+                cursor = busDBHelper.getReadableDatabase().query(
+                        BusContract.BusStopsEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectorArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+
+            case CODE_BUSSERVICES_WITH_SEARCHSTRING:
+                String busServiceSearchString = uri.getLastPathSegment();
+                selectionArguments = new String[] {busServiceSearchString};
+                selectionCriteria = BusContract.BusServicesEntry.COLUMN_SERVICENO + " = ? ";
+                Log.v(TAG, selectionCriteria);
+
+                cursor = busDBHelper.getReadableDatabase().query(
+                        BusContract.BusServicesEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArguments,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
+    }
+
+    @Nullable
+    @Override
+    public String getType(@NonNull Uri uri) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+        return null;
+    }
+
+    @Override
+    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
+        return 0;
+    }
+
+    @Override
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
+        return 0;
+    }
+
+    @Override
+    @TargetApi(11)
+    public void shutdown() {
+        busDBHelper.close();
+        super.shutdown();
+    }
+
+}

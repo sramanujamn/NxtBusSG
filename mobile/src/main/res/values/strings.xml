@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SGNextBus</string>
+
+    <string name="search_hint">Search Bus or Bus Stop</string>
+    <string name="tv_search_text">Find</string>
+
+    <string name="available_seats">Seats Available</string>
+    <string name="available_standing">Standing Available</string>
+    <string name="available_limited_standing">Limited Standing</string>
+</resources>
