@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.sramanujamn.sgbus.sgnextbus.MainActivity">
 
-
-    <LinearLayout
+    <!-- <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="top"
         android:orientation="horizontal">
 
-        <!-- <EditText
+         <EditText
             android:id="@+id/et_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -22,7 +15,7 @@
             android:inputType="textPersonName"
             android:text="" /> -->
 
-        <com.sramanujamn.sgbus.sgnextbus.BusAutoCompleteTextView
+       <!-- <com.sramanujamn.sgbus.sgnextbus.BusAutoCompleteTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_autoCompletBusStops"
@@ -40,6 +33,21 @@
             android:text="Find"
             android:onClick="testButton"/>
 
-    </LinearLayout>
+    </LinearLayout> -->
 
-</FrameLayout>
+
+    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/vp_bus">
+
+    <android.support.design.widget.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tabLayout_bus"
+        app:tabGravity="fill" />
+
+    </android.support.v4.view.ViewPager>
+

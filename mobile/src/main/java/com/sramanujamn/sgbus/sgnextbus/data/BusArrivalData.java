@@ -20,6 +20,66 @@ public class BusArrivalData {
 
     private boolean isWheelChairAccessible;
 
+    private String estimatedArrivalSecondBus;
+
+    private String estimatedArrivalThirdBus;
+
+    private boolean isWheelChairAccessibleSecondBus;
+
+    private boolean isWheelChairAccessibleThirdBus;
+
+    private String loadSecondBus;
+
+    private String loadThirdBus;
+
+    public boolean isWheelChairAccessibleSecondBus() {
+        return isWheelChairAccessibleSecondBus;
+    }
+
+    public void setWheelChairAccessibleSecondBus(boolean wheelChairAccessibleSecondBus) {
+        isWheelChairAccessibleSecondBus = wheelChairAccessibleSecondBus;
+    }
+
+    public boolean isWheelChairAccessibleThirdBus() {
+        return isWheelChairAccessibleThirdBus;
+    }
+
+    public void setWheelChairAccessibleThirdBus(boolean wheelChairAccessibleThirdBus) {
+        isWheelChairAccessibleThirdBus = wheelChairAccessibleThirdBus;
+    }
+
+    public String getLoadSecondBus() {
+        return loadSecondBus;
+    }
+
+    public void setLoadSecondBus(String loadSecondBus) {
+        this.loadSecondBus = loadSecondBus;
+    }
+
+    public String getLoadThirdBus() {
+        return loadThirdBus;
+    }
+
+    public void setLoadThirdBus(String loadThirdBus) {
+        this.loadThirdBus = loadThirdBus;
+    }
+
+    public String getEstimatedArrivalSecondBus() {
+        return estimatedArrivalSecondBus;
+    }
+
+    public void setEstimatedArrivalSecondBus(String estimatedArrivalSecondBus) {
+        this.estimatedArrivalSecondBus = estimatedArrivalSecondBus;
+    }
+
+    public String getEstimatedArrivalThirdBus() {
+        return estimatedArrivalThirdBus;
+    }
+
+    public void setEstimatedArrivalThirdBus(String estimatedArrivalThirdBus) {
+        this.estimatedArrivalThirdBus = estimatedArrivalThirdBus;
+    }
+
 
     public boolean isWheelChairAccessible() {
         return isWheelChairAccessible;

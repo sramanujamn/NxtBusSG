@@ -41,6 +41,10 @@ public class BusJsonUtils {
 
     private static final String WHEELCHAIR_ACCESSIBLE = "WAB";
 
+    private static final String NEXT_BUS_2 = "NextBus2";
+
+    private static final String NEXT_BUS_3 = "NextBus3";
+
 
     /**
      * BUS STOPS
@@ -100,15 +104,33 @@ public class BusJsonUtils {
             //busArrivalDataList[i].setServiceNo(busArrival.getString(SERVICE_NO));
             Log.v(TAG, "Service No: " + busArrival.getString(SERVICE_NO));
 
+            // ADD Details of First Bus
             JSONObject nextBus = busArrival.getJSONObject(NEXT_BUS);
             //busArrivalData.setEstimatedArrival(nextBus.getString(ESTIMATED_ARRIVAL));
             busArrivalData.setEstimatedArrival(BusDateUtils.getRemainingTime(nextBus.getString(ESTIMATED_ARRIVAL)));
             //Log.v(TAG, "Arrival: " + BusDateUtils.getRemainingTime(nextBus.getString(ESTIMATED_ARRIVAL)));
-            //Log.v(TAG, nextBus.getString(ESTIMATED_ARRIVAL));
             busArrivalData.setLoad(nextBus.getString(LOAD));
             if(nextBus.getString(FEATURE).equals(WHEELCHAIR_ACCESSIBLE)) {
                 busArrivalData.setWheelChairAccessible(true);
             }
+
+            // ADD Details of Second Bus
+            JSONObject nextBus2 = busArrival.getJSONObject(NEXT_BUS_2);
+            busArrivalData.setEstimatedArrivalSecondBus(BusDateUtils.getRemainingTime(nextBus2.getString(ESTIMATED_ARRIVAL)));
+            busArrivalData.setLoadSecondBus(nextBus2.getString(LOAD));
+            if(nextBus2.getString(FEATURE).equals(WHEELCHAIR_ACCESSIBLE)) {
+                busArrivalData.setWheelChairAccessibleSecondBus(true);
+            }
+
+
+            // ADD Details of Third Bus
+            JSONObject nextBus3 = busArrival.getJSONObject(NEXT_BUS_3);
+            busArrivalData.setEstimatedArrivalThirdBus(BusDateUtils.getRemainingTime(nextBus3.getString(ESTIMATED_ARRIVAL)));
+            busArrivalData.setLoadThirdBus(nextBus3.getString(LOAD));
+            if(nextBus3.getString(FEATURE).equals(WHEELCHAIR_ACCESSIBLE)) {
+                busArrivalData.setWheelChairAccessibleThirdBus(true);
+            }
+
             busArrivalDataList[i] = busArrivalData;
         }
 

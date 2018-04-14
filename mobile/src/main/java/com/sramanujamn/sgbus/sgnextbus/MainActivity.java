@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
@@ -71,6 +75,30 @@ public class MainActivity extends AppCompatActivity {
 
     private String busStopCode;
 
+    private BusFragmentPagerAdapter busFragmentPagerAdapter;
+    private ViewPager busViewPager;
+    private TabLayout tabLayout;
+
+    private Bundle bundle;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        bundle = new Bundle();
+
+        busFragmentPagerAdapter = new BusFragmentPagerAdapter(getSupportFragmentManager(), bundle);
+        busViewPager = (ViewPager)findViewById(R.id.vp_bus);
+        busViewPager.setAdapter(busFragmentPagerAdapter);
+
+        tabLayout = (TabLayout)findViewById(R.id.tabLayout_bus);
+        tabLayout.setupWithViewPager(busViewPager);
+
+
+    }
+
+    /*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +152,9 @@ public class MainActivity extends AppCompatActivity {
             new FetchBusStopsTask().execute("Test");
         }
     }
+    */
 
+    /*
     public void loadAutoCompleteText(String userInput) {
         Log.v(TAG, "User input: " + userInput);
         if(userInput == null || userInput.length() == 0) {
@@ -143,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         //Log.v(TAG, busStopsArrayAdapter.getItem(0));
         busStopsArrayAdapter.notifyDataSetChanged();
     }
+    */
 
     public void loadAutoCompleteSuggestions(String userInput) {
         Log.v(TAG, "User input: " + userInput);
@@ -164,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         busStopsArrayAdapter.notifyDataSetChanged();
     }
 
+/*
     public void testButton(View view) {
         //EditText editText = (EditText)findViewById(R.id.et_search);
         BusAutoCompleteTextView busStopTextView = (BusAutoCompleteTextView)findViewById(R.id.tv_autoCompletBusStops);
@@ -176,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(BUS_STOP_CODE, busStopCode);
         intent.putExtra(BUS_STOP_NAME, busStopTextView.getText().toString());
         startActivity(intent);
-    }
+    }*/
 
     public String getBusStopCode(String string) {
         int start = string.lastIndexOf("(") + 1;
@@ -185,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
         return string.substring(start, end);
     }
 
+/*
     public class FetchBusStopsTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -224,6 +257,8 @@ public class MainActivity extends AppCompatActivity {
             //}
         }
     }
+    */
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -240,22 +275,7 @@ public class MainActivity extends AppCompatActivity {
 
         searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setDropDownBackgroundDrawable(getResources().getDrawable(R.drawable.common_google_signin_btn_icon_light_normal_background));
-        /*searchAutoComplete.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence userInput, int start, int before, int count) {
-                MainActivity.this.loadAutoCompleteSuggestions(userInput.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });*/
 
         searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -267,11 +287,30 @@ public class MainActivity extends AppCompatActivity {
 
                 //new FetchBusStopArrivalsTask().execute(busStopCode);
 
-                Intent intent = new Intent(MainActivity.this, BusListActivity.class);
-                intent.putExtra(BUS_STOP_CODE, busStopCode);
-                intent.putExtra(BUS_STOP_NAME, query);
-                startActivity(intent);
+                //Intent intent = new Intent(MainActivity.this, BusListActivity.class);
+                //intent.putExtra(BUS_STOP_CODE, busStopCode);
+                //intent.putExtra(BUS_STOP_NAME, query);
+                //startActivity(intent);
 
+
+                //Bundle args = new Bundle();
+                bundle.clear();
+                bundle.putString(MainActivity.BUS_STOP_CODE, busStopCode);
+                BusListFragment busListFragment = (BusListFragment) busFragmentPagerAdapter.getItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
+                //BusListFragment busListFragment = (BusListFragment) getSupportFragmentManager().findFragmentById(R.id.frame_buslist);
+                //busListFragment.refreshData(bundle);
+                //busFragmentPagerAdapter.
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                //fragmentTransaction.remove(busListFragment);
+                //busListFragment = new BusListFragment();
+                busListFragment.setArguments(bundle);
+                Log.v(TAG, "SET THE BUNDLE!!!");
+                fragmentTransaction.replace(R.id.frame_buslist, busListFragment);
+                fragmentTransaction.commit();
+
+                busViewPager.setCurrentItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
+                //busFragmentPagerAdapter.notifyDataSetChanged();
+                searchAutoComplete.setText(query);
             }
         });
 
