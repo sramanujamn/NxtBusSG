@@ -61,7 +61,7 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
     @Override
     public BusArrivalAdapter.BusArrivalAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        int layoutIdForListItem = R.layout.fragment_bus_list;
+        int layoutIdForListItem = R.layout.fragment_busarrival_list;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
@@ -116,6 +116,12 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
                 }
             }
         });
+
+        if(position == (getItemCount()-1)) {
+            holder.itemView.setPadding(0, 0, 0 , 480);
+        } else {
+            holder.itemView.setPadding(0,0,0,0);
+        }
     }
 
     @Override

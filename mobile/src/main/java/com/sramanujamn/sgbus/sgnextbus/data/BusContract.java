@@ -14,6 +14,7 @@ public class BusContract {
 
     public static final String PATH_BUSSERVICES = "busservices";
 
+    public static final String PATH_BUSROUTES = "busroutes";
 
     /**
      * Table for Bus Stops
@@ -61,5 +62,9 @@ public class BusContract {
         public static final String COLUMN_PM_PEAK_FREQ = "pm_peak_freq";
         public static final String COLUMN_PM_OFFPEAK_FREQ = "pm_offpeak_freq";
         public static final String COLUMN_LOOPDESC = "loopdesc";
+    }
+
+    public static final class BusRoutesEntry implements BaseColumns {
+
     }
 }

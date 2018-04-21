@@ -19,7 +19,7 @@ public class BusDateUtils {
 
     public static String getRemainingTime(String dateString) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        Log.v(TAG, "Parsing Date: " + dateString);
+        //Log.v(TAG, "Parsing Date: " + dateString);
         if(dateString != null && dateString.length() > 0) {
             try {
 
@@ -28,7 +28,7 @@ public class BusDateUtils {
                 long seconds = (date.getTime() - System.currentTimeMillis())/1000;
                 //Log.v(TAG, "seconds: " + seconds);
                 int minutes = (int)(seconds/60);
-                Log.v(TAG, "Minutes Remaining: " + minutes);
+                //Log.v(TAG, "Minutes Remaining: " + minutes);
                 if(minutes > 1) {
                     return minutes + " mins";
                 } else {

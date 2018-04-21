@@ -86,6 +86,27 @@ public class BusJsonUtils {
     private static final String LOOPDESC = "LoopDesc";
 
 
+    /**
+     * BUS ROUTES
+     */
+    private static final String STOP_SEQUENCE = "StopSequence";
+
+    private static final String DISTANCE = "Distance";
+
+    private static final String WD_FIRST_BUS = "WD_FirstBus";
+
+    private static final String WD_LAST_BUS = "WD_LastBus";
+
+    private static final String SAT_FIRST_BUS = "SAT_FirstBus";
+
+    private static final String SAT_LAST_BUS = "SAT_LastBus";
+
+    private static final String SUN_FIRST_BUS = "SUN_FirstBus";
+
+    private static final String SUN_LAST_BUS = "SUN_LastBus";
+
+
+
     public static BusArrivalData[] getBusArrivalDatafromJson(String jsonString) throws JSONException {
 
         BusArrivalData[] busArrivalDataList = null;

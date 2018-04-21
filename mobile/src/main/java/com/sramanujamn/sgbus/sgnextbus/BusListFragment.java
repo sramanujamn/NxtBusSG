@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.sramanujamn.sgbus.sgnextbus.data.BusArrivalData;
 import com.sramanujamn.sgbus.sgnextbus.data.BusDBHelper;
@@ -41,6 +42,8 @@ public class BusListFragment extends Fragment {
 
     private BusDBHelper busDBHelper;
 
+    private TextView titleView;
+
 
     @Nullable
     @Override
@@ -51,6 +54,8 @@ public class BusListFragment extends Fragment {
         //Log.v(TAG, "INSIDE OnCreateView()!!!");
         Context context = rootView.getContext();
         busDBHelper = new BusDBHelper(context);
+
+        titleView = (TextView)rootView.findViewById(R.id.tv_bus_stop_title);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_bus_list);
@@ -67,6 +72,17 @@ public class BusListFragment extends Fragment {
 
         //Intent intent = getIntent();
         Bundle args = getArguments();
+        if(args != null && args.getString(MainActivity.BUS_STOP_NAME) != null) {
+            //Log.v(TAG, "BUSSTOPCODE has Values!!! Inside OnCreateView()!!!");
+            String busStopName = args.getString(MainActivity.BUS_STOP_NAME);
+            titleView.setText(busStopName);
+            //rootView.setTitle(intent.getStringExtra(MainActivity.BUS_STOP_NAME));
+        } else {
+            //Log.v(TAG, "Bus Stop Code is null!!!");
+            //String busStopCode = "42119";
+            //new BusListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
+        }
+
         if(args != null && args.getString(MainActivity.BUS_STOP_CODE) != null) {
             //Log.v(TAG, "BUSSTOPCODE has Values!!! Inside OnCreateView()!!!");
             String busStopCode = args.getString(MainActivity.BUS_STOP_CODE);
@@ -77,14 +93,6 @@ public class BusListFragment extends Fragment {
             //String busStopCode = "42119";
             //new BusListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
         }
-
-        /*
-        if(intent.hasExtra(MainActivity.BUS_STOP_CODE)) {
-            String busStopCode = intent.getStringExtra(MainActivity.BUS_STOP_CODE);
-            new BusListActivity.FetchBusStopArrivalsTask().execute(busStopCode);
-            this.setTitle(intent.getStringExtra(MainActivity.BUS_STOP_NAME));
-        }
-        */
 
         mRecyclerView.setVisibility(View.VISIBLE);
 
@@ -116,7 +124,7 @@ public class BusListFragment extends Fragment {
                 //Log.v(TAG, "Rows inserted: " + rowsInserted);
 
                 String jsonApiResponse = BusNetworkUtils.getResponseFromHttpUrl(busStopArrivalUrl);
-                Log.v(TAG, jsonApiResponse);
+                //Log.v(TAG, jsonApiResponse);
                 //Log.v(TAG, "Got JSON Response");
                 busArrivalDataList = BusJsonUtils.getBusArrivalDatafromJson(jsonApiResponse);
                 return jsonApiResponse;

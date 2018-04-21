@@ -1,6 +1,7 @@
 package com.sramanujamn.sgbus.sgnextbus;
 
 import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
@@ -60,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     private SearchView.SearchAutoComplete searchAutoComplete;
 
+    //private BusSearchAutoCompleteView.SearchAutoComplete searchAutoComplete;
+
     public static final String BUS_STOP_CODE = "BusStopCode";
 
     public static final String BUS_STOP_NAME = "BusStopName";
@@ -96,6 +102,19 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(busViewPager);
 
 
+        //BusDBHelper busDBHelper = new BusDBHelper(getApplicationContext());
+        //SQLiteDatabase db = busDBHelper.getReadableDatabase();
+        if(!new BusDBHelper(getBaseContext()).hasTableInDB(BusContract.BusStopsEntry.TABLE_NAME)) {
+            new FetchBusStopsTask().execute("Test");
+        } else {
+            Log.v(TAG, "BUSSTOPS Table already exists.");
+        }
+
+        //if(!new BusDBHelper(getBaseContext()).hasTableInDB(BusContract.BusServicesEntry.TABLE_NAME)) {
+            new FetchBusRoutesTask().execute("Test");
+        //} else {
+            //Log.v(TAG, "BUSRoutes Table already exists.");
+        //}
     }
 
     /*
@@ -186,29 +205,20 @@ public class MainActivity extends AppCompatActivity {
         if(cursor.moveToFirst()) {
             do {
                 busStops.add( cursor.getString(INDEX_BUS_STOP_DESCRIPTION) + " (" + cursor.getString(INDEX_BUS_STOP_CODE) + ")");
+                //busStops.add( cursor.getString(INDEX_BUS_STOP_DESCRIPTION) + " " + cursor.getString(INDEX_BUS_STOP_CODE));
             } while(cursor.moveToNext());
+        }
+        for(int i = 0; i < busStops.size(); i++) {
+            Log.v(TAG, busStops.get(i));
         }
         busStopsArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, busStops);
         //searchView.setSuggestionsAdapter(busStopsArrayAdapter);
+        //searchAutoComplete.setFilters(new InputFilter[] {});
+        //searchView.setSearchableInfo(((SearchManager) getSystemService(Context.SEARCH_SERVICE)).getSearchableInfo(getComponentName()));
         searchAutoComplete.setAdapter(busStopsArrayAdapter);
-        //Log.v(TAG, busStopsArrayAdapter.getItem(0));
+        Log.v(TAG, "ArrayAdapter Count: " + busStopsArrayAdapter.getCount());
         busStopsArrayAdapter.notifyDataSetChanged();
     }
-
-/*
-    public void testButton(View view) {
-        //EditText editText = (EditText)findViewById(R.id.et_search);
-        BusAutoCompleteTextView busStopTextView = (BusAutoCompleteTextView)findViewById(R.id.tv_autoCompletBusStops);
-        //String busStopCode = editText.getText().toString();
-        String busStopCode = getBusStopCode(busStopTextView.getText().toString());
-
-        //new FetchBusStopArrivalsTask().execute(busStopCode);
-
-        Intent intent = new Intent(this, BusListActivity.class);
-        intent.putExtra(BUS_STOP_CODE, busStopCode);
-        intent.putExtra(BUS_STOP_NAME, busStopTextView.getText().toString());
-        startActivity(intent);
-    }*/
 
     public String getBusStopCode(String string) {
         int start = string.lastIndexOf("(") + 1;
@@ -217,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         return string.substring(start, end);
     }
 
-/*
+
     public class FetchBusStopsTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -257,8 +267,48 @@ public class MainActivity extends AppCompatActivity {
             //}
         }
     }
-    */
 
+
+    public class FetchBusRoutesTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            int skip = 0;
+            int rowsInserted = 0;
+            URL busRoutesUrl = null;
+
+            do {
+                try {
+                    busRoutesUrl = BusNetworkUtils.buildUrlForBusRoutes(skip);
+                    Log.v(TAG, busRoutesUrl.toString());
+                    String jsonApiResponse = BusNetworkUtils.getResponseFromHttpUrl(busRoutesUrl);
+                    Log.v(TAG, jsonApiResponse);
+
+                    //rowsInserted = getContentResolver().bulkInsert(BusContract.BusStopsEntry.CONTENT_URI, BusJsonUtils.getBusServicesFromJson(jsonApiResponse));
+                    //Log.v(TAG, "Rows inserted: " + rowsInserted);
+                    //skip += rowsInserted;
+                } catch (IOException ioe) {
+                    Log.e(TAG, "Error receiving response: " + busRoutesUrl);
+                    return null;
+                //} catch(JSONException jsone) {
+                    //Log.e(TAG, "Error parsing JSON response: " + jsone.getMessage());
+                    //return null;
+                }
+
+            } while(rowsInserted > 0);
+
+            return "SUCCESS";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            //super.onPostExecute(s);
+            //if(busArrivalDataList != null) {
+            Log.v(TAG, "Reached onPostExecute");
+            //mBusArrivalAdapter.setBusArrivalDataList(busArrivalDataList);
+            //}
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -268,13 +318,29 @@ public class MainActivity extends AppCompatActivity {
         // Associate the searchable configuration with the Search View
         //SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView.setQueryRefinementEnabled(false);
 
-        Log.v(TAG, getComponentName().toString());
+        //Log.v(TAG, getComponentName().toString());
         //searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, BusListActivity.class)));
         //searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        //searchAutoComplete = (BusSearchAutoCompleteView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+
+
         searchAutoComplete.setDropDownBackgroundDrawable(getResources().getDrawable(R.drawable.common_google_signin_btn_icon_light_normal_background));
+
+        /*InputFilter filter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence charSequence, int i, int i1, Spanned spanned, int i2, int i3) {
+                return null;
+            }
+        };*/
+
+        //searchAutoComplete.setFilters(new InputFilter[] {filter});
+
+        //searchView.setInputType(InputType.TYPE_TEXT_VARIATION_PHONETIC | InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT);
+        //searchAutoComplete.setInputType(InputType.TYPE_TEXT_VARIATION_PHONETIC);
 
 
         searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -285,17 +351,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.v(TAG, "User Query: " + query);
                 String busStopCode = getBusStopCode(query);
 
-                //new FetchBusStopArrivalsTask().execute(busStopCode);
-
-                //Intent intent = new Intent(MainActivity.this, BusListActivity.class);
-                //intent.putExtra(BUS_STOP_CODE, busStopCode);
-                //intent.putExtra(BUS_STOP_NAME, query);
-                //startActivity(intent);
-
-
                 //Bundle args = new Bundle();
                 bundle.clear();
                 bundle.putString(MainActivity.BUS_STOP_CODE, busStopCode);
+                bundle.putString(MainActivity.BUS_STOP_NAME, query);
                 BusListFragment busListFragment = (BusListFragment) busFragmentPagerAdapter.getItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
                 //BusListFragment busListFragment = (BusListFragment) getSupportFragmentManager().findFragmentById(R.id.frame_buslist);
                 //busListFragment.refreshData(bundle);
@@ -306,24 +365,29 @@ public class MainActivity extends AppCompatActivity {
                 busListFragment.setArguments(bundle);
                 Log.v(TAG, "SET THE BUNDLE!!!");
                 fragmentTransaction.replace(R.id.frame_buslist, busListFragment);
+                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 
                 busViewPager.setCurrentItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
                 //busFragmentPagerAdapter.notifyDataSetChanged();
-                searchAutoComplete.setText(query);
+                searchAutoComplete.setText("" + query);
             }
         });
+
+        //searchView.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        //searchAutoComplete.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.v(TAG, "Query Text: " + query);
+                //Log.v(TAG, "Query Text: " + query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String query) {
-                Log.v(TAG, "Query changed...");
+                //Log.v(TAG, "Query changed...");
                 MainActivity.this.loadAutoCompleteSuggestions(query);
                 return false;
             }
@@ -332,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(TAG, "Reached here!");
+                //Log.v(TAG, "Reached here!");
             }
         });
 
@@ -342,7 +406,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        Log.v(TAG, "Reached here!");
+        //Log.v(TAG, "Reached here!");
         //super.onNewIntent(intent);
+    }
+
+    public void loadBusArrivalList(String busStopName, String busStopCode) {
+        bundle.clear();
+        bundle.putString(MainActivity.BUS_STOP_CODE, busStopCode);
+        bundle.putString(MainActivity.BUS_STOP_NAME, busStopName);
+        BusListFragment busListFragment = (BusListFragment) busFragmentPagerAdapter.getItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
+        //BusListFragment busListFragment = (BusListFragment) getSupportFragmentManager().findFragmentById(R.id.frame_buslist);
+        //busListFragment.refreshData(bundle);
+        //busFragmentPagerAdapter.
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //fragmentTransaction.remove(busListFragment);
+        //busListFragment = new BusListFragment();
+        busListFragment.setArguments(bundle);
+        Log.v(TAG, "SET THE BUNDLE!!!");
+        fragmentTransaction.replace(R.id.frame_buslist, busListFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+
+        busViewPager.setCurrentItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
     }
 }
