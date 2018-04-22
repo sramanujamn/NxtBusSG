@@ -213,7 +213,7 @@ public class BusProvider extends ContentProvider {
                 String sqlQuery = "select route.serviceno as serviceno, route.busstopcode as busstopcode, route.distance as distance, " +
                         " stop.description as description, route.direction as direction, route.stopsequence as stopsequence " +
                         " from busroutes route inner join busstops stop on route.busstopcode = stop.busstopcode " +
-                        " and serviceno = ? and direction = (select direction from busroutes where busstopcode = ?) " +
+                        " and serviceno = ? and direction = (select direction from busroutes where serviceno = route.serviceno and busstopcode = ?) " +
                         " order by route.direction, distance, route.stopsequence";
 
                 cursor = busDBHelper.getReadableDatabase().rawQuery(

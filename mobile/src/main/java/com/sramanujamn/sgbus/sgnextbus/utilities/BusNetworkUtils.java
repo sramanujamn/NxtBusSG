@@ -162,6 +162,8 @@ public class BusNetworkUtils {
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        // always remove line before committing to github
+        urlConnection.setRequestProperty("AccountKey", "UPTIRnJKR8SSXd5Bwo3YSQ==");
         urlConnection.setRequestProperty("accept", "application/json");
         try {
             InputStream in = urlConnection.getInputStream();

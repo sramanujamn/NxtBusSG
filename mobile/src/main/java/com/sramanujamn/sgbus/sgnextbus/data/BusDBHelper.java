@@ -68,6 +68,7 @@ public class BusDBHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()) {
             return true;
         }
+        cursor.close();
         return false;
     }
 

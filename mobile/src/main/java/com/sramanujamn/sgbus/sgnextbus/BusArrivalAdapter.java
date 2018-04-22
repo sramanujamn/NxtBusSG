@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -17,6 +19,9 @@ import android.widget.TextView;
 
 import com.sramanujamn.sgbus.sgnextbus.data.BusArrivalData;
 import com.sramanujamn.sgbus.sgnextbus.data.BusContract;
+import com.sramanujamn.sgbus.sgnextbus.data.BusRouteData;
+
+import java.util.ArrayList;
 
 /**
  * Created by raja on 3/27/2018.
@@ -36,6 +41,8 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
     private static final int INDEX_DESCRIPTION = 3;
     private static final int INDEX_DIRECTION = 4;
     private static final int INDEX_STOPSEQUENCE = 5;
+
+    private RecyclerView busRouteRecyclerView;
 
     public String getBusStopCode() {
         return busStopCode;
@@ -63,7 +70,8 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         public final ImageView mWheelchairImageView;
         public final TextView mEstimatedArrivalSecondBusTextView;
         public final TextView mEstimatedArrivalThirdBusTextView;
-        private ConstraintLayout busExpandedLayout;
+        //private ConstraintLayout busExpandedLayout;
+        private RecyclerView busRouteRecyclerView;
 
 
         public BusArrivalAdapterViewHolder(View view) {
@@ -77,9 +85,34 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
             mEstimatedArrivalSecondBusTextView = (TextView)view.findViewById(R.id.tv_next_bus2_arrival_time);
             mEstimatedArrivalThirdBusTextView = (TextView)view.findViewById(R.id.tv_next_bus3_arrival_time);
             isExpanded = false;
-            busExpandedLayout = (ConstraintLayout)view.findViewById(R.id.vw_bus_expanded);
-            busExpandedLayout.setVisibility(View.GONE);
+            //busExpandedLayout = (ConstraintLayout)view.findViewById(R.id.vw_bus_expanded);
+            busRouteRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_nested_busroutes_list);
+            //busExpandedLayout.setVisibility(View.GONE);
+            busRouteRecyclerView.setVisibility(View.GONE);
             //int baseline = dividerView.getBaseline();
+
+            //Context context = view.getContext();
+            //LayoutInflater inflater = LayoutInflater.from(context);
+            //boolean shouldAttachToParentImmediately = false;
+            //View rootView = holder.itemView.getRootView();
+            //View rootView = holder.busExpandedLayout.getRootView();
+            //View rootView = inflater.inflate(R.layout.rv_busroutes_list, (ViewGroup) view.getParent(), shouldAttachToParentImmediately);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false);
+            //busRouteRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_busroutes_list);
+            //RecyclerView mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_busroutes_list);
+
+            busRouteRecyclerView.setHasFixedSize(true);
+
+            busRouteRecyclerView.setLayoutManager(layoutManager);
+
+            //BusRoutesAdapter busRoutesAdapter = new BusRoutesAdapter();
+            //busRoutesAdapter.setBusRouteDataList(busRouteData);
+
+            //busRouteRecyclerView.setAdapter(busRoutesAdapter);
+
+            //busRouteRecyclerView.setVisibility(View.VISIBLE);
+            busRouteRecyclerView.setNestedScrollingEnabled(true);
+            //busRoutesAdapter.notifyDataSetChanged();
         }
 
     }
@@ -129,18 +162,18 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(holder.busExpandedLayout.getVisibility() == View.GONE) {
+                if(holder.busRouteRecyclerView.getVisibility() == View.GONE) {
                     //holder.mEstimatedArrivalSecondBusTextView.setVisibility(View.VISIBLE);
                     //holder.dividerView.setVisibility(View.VISIBLE);
                     if(Build.VERSION.SDK_INT >= 19) {
-                        TransitionManager.beginDelayedTransition(holder.busExpandedLayout);
+                        TransitionManager.beginDelayedTransition(holder.busRouteRecyclerView);
                     }
-                    holder.busExpandedLayout.setVisibility(View.VISIBLE);
+                    holder.busRouteRecyclerView.setVisibility(View.VISIBLE);
                     isExpanded = true;
                     //TextView titleView = (TextView)holder.itemView.findViewById(R.id.tv_bus_stop_title);
                     setupBusRoute(holder, holder.mServiceNoTextView.getText().toString(), busStopCode);
                 } else {
-                    holder.busExpandedLayout.setVisibility(View.GONE);
+                    holder.busRouteRecyclerView.setVisibility(View.GONE);
                     isExpanded = false;
                 }
             }
@@ -171,11 +204,49 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         Log.v(TAG, "Uri: " + uri.toString());
         String[] selectionArgs = new String[] {busServiceNo, mainActivity.getBusStopCode(busStopCode)};
         Cursor cursor = mainActivity.getContentResolver().query(uri, null, null, selectionArgs, null);
+        ArrayList<BusRouteData> busRouteDataList = new ArrayList<BusRouteData>();
         if(cursor.moveToFirst()) {
             do {
-                Log.v(TAG, "Bus Stops" + cursor.getString(INDEX_DESCRIPTION));
+                BusRouteData busRouteData = new BusRouteData();
+                busRouteData.setBusStopCode(cursor.getString(INDEX_DESCRIPTION));
+                busRouteData.setDistance(cursor.getString(INDEX_DISTANCE));
+                busRouteDataList.add(busRouteData);
             } while(cursor.moveToNext());
         }
         cursor.close();
+        BusRouteData[] busRouteData = new BusRouteData[busRouteDataList.size()];
+        for(int i = 0; i < busRouteDataList.size(); i++) {
+            busRouteData[i] = busRouteDataList.get(i);
+            Log.v(TAG, "Bus Stops: " + busRouteData[i].getBusStopCode());
+        }
+
+        /*Context context = holder.itemView.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        boolean shouldAttachToParentImmediately = false;
+        //View rootView = holder.itemView.getRootView();
+        //View rootView = holder.busExpandedLayout.getRootView();
+        View rootView = inflater.inflate(R.layout.rv_busroutes_list, (ViewGroup) holder.itemView.getParent(), shouldAttachToParentImmediately);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
+        RecyclerView mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_busroutes_list);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        BusRoutesAdapter busRoutesAdapter = new BusRoutesAdapter();
+        busRoutesAdapter.setBusRouteDataList(busRouteData);
+
+        mRecyclerView.setAdapter(busRoutesAdapter);
+
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mRecyclerView.setNestedScrollingEnabled(true);
+        busRoutesAdapter.notifyDataSetChanged();
+        */
+
+        BusRoutesAdapter busRoutesAdapter = new BusRoutesAdapter();
+        busRoutesAdapter.setBusRouteDataList(busRouteData);
+        holder.busRouteRecyclerView.setAdapter(busRoutesAdapter);
+        busRoutesAdapter.notifyDataSetChanged();
     }
 }

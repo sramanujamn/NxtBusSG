@@ -245,6 +245,7 @@ public class NearbyBusStopsFragment extends Fragment {
                     }
                 } while(cursor.moveToNext());
             }
+            cursor.close();
             return null;
         }
 
