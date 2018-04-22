@@ -2,10 +2,13 @@ package com.sramanujamn.sgbus.sgnextbus;
 
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sramanujamn.sgbus.sgnextbus.data.BusArrivalData;
+import com.sramanujamn.sgbus.sgnextbus.data.BusContract;
 
 /**
  * Created by raja on 3/27/2018.
@@ -20,12 +24,35 @@ import com.sramanujamn.sgbus.sgnextbus.data.BusArrivalData;
 
 public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.BusArrivalAdapterViewHolder> {
 
+    public static final String TAG = BusArrivalAdapter.class.getSimpleName();
+
     private boolean isExpanded;
 
     private BusArrivalData[] busArrivalDataList;
 
+    private static final int INDEX_SERVICENO = 0;
+    private static final int INDEX_BUSSTOPCODE = 1;
+    private static final int INDEX_DISTANCE = 2;
+    private static final int INDEX_DESCRIPTION = 3;
+    private static final int INDEX_DIRECTION = 4;
+    private static final int INDEX_STOPSEQUENCE = 5;
+
+    public String getBusStopCode() {
+        return busStopCode;
+    }
+
+    public void setBusStopCode(String busStopCode) {
+        this.busStopCode = busStopCode;
+    }
+
+    private String busStopCode;
+
     public BusArrivalAdapter() {
 
+    }
+
+    public BusArrivalAdapter(String busStopCode) {
+        this.busStopCode = busStopCode;
     }
 
     public class BusArrivalAdapterViewHolder extends RecyclerView.ViewHolder {
@@ -35,7 +62,7 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         public final TextView mLoadTextView;
         public final ImageView mWheelchairImageView;
         public final TextView mEstimatedArrivalSecondBusTextView;
-        public final TextView getmEstimatedArrivalThirdBusTextView;
+        public final TextView mEstimatedArrivalThirdBusTextView;
         private ConstraintLayout busExpandedLayout;
 
 
@@ -47,8 +74,8 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
             mWheelchairImageView = (ImageView)view.findViewById(R.id.iv_wab);
 
 
-            mEstimatedArrivalSecondBusTextView = (TextView)view.findViewById(R.id.tv_next_bus2_arrival_time2);
-            getmEstimatedArrivalThirdBusTextView = (TextView)view.findViewById(R.id.tv_next_bus3_arrival_time);
+            mEstimatedArrivalSecondBusTextView = (TextView)view.findViewById(R.id.tv_next_bus2_arrival_time);
+            mEstimatedArrivalThirdBusTextView = (TextView)view.findViewById(R.id.tv_next_bus3_arrival_time);
             isExpanded = false;
             busExpandedLayout = (ConstraintLayout)view.findViewById(R.id.vw_bus_expanded);
             busExpandedLayout.setVisibility(View.GONE);
@@ -76,7 +103,7 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         holder.mEstimatedArrivalTextView.setText(busArrivalData.getEstimatedArrival());
 
         holder.mEstimatedArrivalSecondBusTextView.setText(busArrivalData.getEstimatedArrivalSecondBus());
-        holder.getmEstimatedArrivalThirdBusTextView.setText(busArrivalData.getEstimatedArrivalThirdBus());
+        holder.mEstimatedArrivalThirdBusTextView.setText(busArrivalData.getEstimatedArrivalThirdBus());
 
         switch(busArrivalData.getLoad()) {
             case BusArrivalData.SEATS_AVAILABLE:
@@ -110,6 +137,8 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
                     }
                     holder.busExpandedLayout.setVisibility(View.VISIBLE);
                     isExpanded = true;
+                    //TextView titleView = (TextView)holder.itemView.findViewById(R.id.tv_bus_stop_title);
+                    setupBusRoute(holder, holder.mServiceNoTextView.getText().toString(), busStopCode);
                 } else {
                     holder.busExpandedLayout.setVisibility(View.GONE);
                     isExpanded = false;
@@ -133,5 +162,20 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
     public void setBusArrivalDataList(BusArrivalData[] busArrivalDataList) {
         this.busArrivalDataList = busArrivalDataList;
         notifyDataSetChanged();
+    }
+
+    public void setupBusRoute(BusArrivalAdapter.BusArrivalAdapterViewHolder holder, String busServiceNo, String busStopCode) {
+        Log.v(TAG, "Bus Service No.: " + busServiceNo + ", Bus Stop Code: " + busStopCode);
+        MainActivity mainActivity = (MainActivity)holder.itemView.getContext();
+        Uri uri = BusContract.BusRoutesEntry.buildBusRouteSearchUri(busServiceNo, mainActivity.getBusStopCode(busStopCode));
+        Log.v(TAG, "Uri: " + uri.toString());
+        String[] selectionArgs = new String[] {busServiceNo, mainActivity.getBusStopCode(busStopCode)};
+        Cursor cursor = mainActivity.getContentResolver().query(uri, null, null, selectionArgs, null);
+        if(cursor.moveToFirst()) {
+            do {
+                Log.v(TAG, "Bus Stops" + cursor.getString(INDEX_DESCRIPTION));
+            } while(cursor.moveToNext());
+        }
+        cursor.close();
     }
 }

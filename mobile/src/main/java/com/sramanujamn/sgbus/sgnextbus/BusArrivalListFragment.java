@@ -1,7 +1,6 @@
 package com.sramanujamn.sgbus.sgnextbus;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,9 +25,9 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URL;
 
-public class BusListFragment extends Fragment {
+public class BusArrivalListFragment extends Fragment {
 
-    private static final String TAG = BusListFragment.class.getSimpleName();
+    private static final String TAG = BusArrivalListFragment.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
 
@@ -76,22 +75,23 @@ public class BusListFragment extends Fragment {
             //Log.v(TAG, "BUSSTOPCODE has Values!!! Inside OnCreateView()!!!");
             String busStopName = args.getString(MainActivity.BUS_STOP_NAME);
             titleView.setText(busStopName);
+            mBusArrivalAdapter.setBusStopCode(busStopName);
             //rootView.setTitle(intent.getStringExtra(MainActivity.BUS_STOP_NAME));
         } else {
             //Log.v(TAG, "Bus Stop Code is null!!!");
             //String busStopCode = "42119";
-            //new BusListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
+            //new BusArrivalListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
         }
 
         if(args != null && args.getString(MainActivity.BUS_STOP_CODE) != null) {
             //Log.v(TAG, "BUSSTOPCODE has Values!!! Inside OnCreateView()!!!");
             String busStopCode = args.getString(MainActivity.BUS_STOP_CODE);
-            new BusListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
+            new BusArrivalListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
             //rootView.setTitle(intent.getStringExtra(MainActivity.BUS_STOP_NAME));
         } else {
             //Log.v(TAG, "Bus Stop Code is null!!!");
             //String busStopCode = "42119";
-            //new BusListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
+            //new BusArrivalListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
         }
 
         mRecyclerView.setVisibility(View.VISIBLE);
@@ -143,65 +143,11 @@ public class BusListFragment extends Fragment {
         protected void onPostExecute(String s) {
             //super.onPostExecute(s);
             if(busArrivalDataList != null) {
-                //Log.v(TAG, "Reached onPostExecute" );
-                //LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-                //mRecyclerView = (RecyclerView).findViewById(R.id.recyclerview_bus_list);
-
-                //mRecyclerView.setHasFixedSize(true);
-
-                //mRecyclerView.setLayoutManager(layoutManager);
-
-               //mBusArrivalAdapter = new BusArrivalAdapter();
-
                 //mRecyclerView.setAdapter(mBusArrivalAdapter);
                 mBusArrivalAdapter.setBusArrivalDataList(busArrivalDataList);
                 mBusArrivalAdapter.notifyDataSetChanged();
                 //Log.v(TAG, "Item count: " + mBusArrivalAdapter.getItemCount());
-
             }
         }
     }
-
-    /*
-    @Override
-    public void onAttach(Context context) {
-        //super.onAttach(context);
-
-    }
-    */
-
-    /*
-    @Override
-    public void onResume() {
-        super.onResume();
-        Bundle args = getArguments();
-        Log.v(TAG, "Inside onAttach()");
-        if(args.getString(MainActivity.BUS_STOP_CODE) != null) {
-            String busStopCode = args.getString(MainActivity.BUS_STOP_CODE);
-            new BusListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
-            //rootView.setTitle(intent.getStringExtra(MainActivity.BUS_STOP_NAME));
-        } else {
-            String busStopCode = "42119";
-            new BusListFragment.FetchBusStopArrivalsTask().execute(busStopCode);
-        }
-    }*/
-
-    /*
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        //super.onViewCreated(view, savedInstanceState);
-        Context context = view.getContext();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
-        mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_bus_list);
-
-        mRecyclerView.setHasFixedSize(true);
-
-        mRecyclerView.setLayoutManager(layoutManager);
-
-        mBusArrivalAdapter = new BusArrivalAdapter();
-
-        mRecyclerView.setAdapter(mBusArrivalAdapter);
-
-    }
-    */
 }

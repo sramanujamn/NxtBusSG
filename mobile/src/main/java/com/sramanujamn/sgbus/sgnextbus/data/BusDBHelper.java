@@ -9,7 +9,7 @@ public class BusDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "nextbusg.db";
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public BusDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,12 +30,33 @@ public class BusDBHelper extends SQLiteOpenHelper {
                 + BusContract.BusStopsEntry.COLUMN_LONGITUDE + " REAL NOT NULL, "
                 + " UNIQUE (" + BusContract.BusStopsEntry.COLUMN_BUSSTOPCODE + ") ON CONFLICT REPLACE"
                 + ")";
-        sqLiteDatabase.execSQL(SQL_CREATE_BUSSTOPS_TABLE);
+
+        final String SQL_CREATE_BUSROUTES_TABLE = "CREATE TABLE " + BusContract.BusRoutesEntry.TABLE_NAME
+                + "("
+                + BusContract.BusRoutesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + BusContract.BusRoutesEntry.COLUMN_SERVICENO + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_OPERATOR + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_DIRECTION + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_STOPSEQUENCE + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_BUSSTOPCODE + " INTEGER NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_DISTANCE + " REAL NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_WD_FIRSTBUS + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_WD_LASTBUS + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_SAT_FIRSTBUS + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_SAT_LASTBUS + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_SUN_FIRSTBUS + " TEXT NOT NULL, "
+                + BusContract.BusRoutesEntry.COLUMN_SUN_LASTBUS + " TEXT NOT NULL "
+                + " ON CONFLICT REPLACE"
+                + ")";
+
+        //sqLiteDatabase.execSQL(SQL_CREATE_BUSSTOPS_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_BUSROUTES_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusStopsEntry.TABLE_NAME);
+        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusStopsEntry.TABLE_NAME);
+        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusRoutesEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 

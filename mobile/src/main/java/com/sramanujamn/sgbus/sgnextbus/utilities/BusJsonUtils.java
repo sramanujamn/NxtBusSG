@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class BusJsonUtils {
     public BusArrivalData[] busArrivalData;
 
-    private static final String TAG = BusArrivalData.class.getSimpleName();
+    private static final String TAG = BusJsonUtils.class.getSimpleName();
 
 
     /**
@@ -205,6 +205,39 @@ public class BusJsonUtils {
             cv.put(BusContract.BusServicesEntry.COLUMN_PM_PEAK_FREQ, busService.getString(PM_PEAK_FREQ));
             cv.put(BusContract.BusServicesEntry.COLUMN_PM_OFFPEAK_FREQ, busService.getString(PM_OFFPEAK_FREQ));
             cv.put(BusContract.BusServicesEntry.COLUMN_LOOPDESC, busService.getString(LOOPDESC));
+            contentValues[i] = cv;
+        }
+
+        return contentValues;
+    }
+
+    public static ContentValues[] getBusRoutesFromJson(String jsonString) throws JSONException {
+        ContentValues[] contentValues = null;
+
+        JSONObject jsonRootObject = new JSONObject(jsonString);
+
+        JSONArray jsonBusRoutesArray = jsonRootObject.getJSONArray(LIST);
+
+        contentValues = new ContentValues[jsonBusRoutesArray.length()];
+
+
+        for(int i = 0; i < contentValues.length; i++) {
+            JSONObject busRoute = jsonBusRoutesArray.getJSONObject(i);
+            //Log.v(TAG, busRoute.toString());
+            ContentValues cv = new ContentValues();
+            cv.put(BusContract.BusRoutesEntry.COLUMN_SERVICENO, busRoute.getString(SERVICE_NO));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_OPERATOR, busRoute.getString(OPERATOR));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_DIRECTION, busRoute.getString(DIRECTION));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_STOPSEQUENCE, busRoute.getString(STOP_SEQUENCE));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_BUSSTOPCODE, busRoute.getString(BUS_STOP_CODE));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_DISTANCE, busRoute.getString(DISTANCE));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_WD_FIRSTBUS, busRoute.getString(WD_FIRST_BUS));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_WD_LASTBUS, busRoute.getString(WD_LAST_BUS));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_SAT_FIRSTBUS, busRoute.getString(SAT_FIRST_BUS));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_SAT_LASTBUS, busRoute.getString(SAT_LAST_BUS));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_SUN_FIRSTBUS, busRoute.getString(SUN_FIRST_BUS));
+            cv.put(BusContract.BusRoutesEntry.COLUMN_SUN_LASTBUS, busRoute.getString(SUN_LAST_BUS));
+
             contentValues[i] = cv;
         }
 

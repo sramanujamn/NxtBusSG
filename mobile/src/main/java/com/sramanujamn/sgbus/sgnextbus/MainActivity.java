@@ -1,9 +1,5 @@
 package com.sramanujamn.sgbus.sgnextbus;
 
-import android.app.SearchManager;
-import android.app.SearchableInfo;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,21 +8,13 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.InputType;
-import android.text.Spanned;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -101,98 +89,19 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout)findViewById(R.id.tabLayout_bus);
         tabLayout.setupWithViewPager(busViewPager);
 
-
-        //BusDBHelper busDBHelper = new BusDBHelper(getApplicationContext());
-        //SQLiteDatabase db = busDBHelper.getReadableDatabase();
         if(!new BusDBHelper(getBaseContext()).hasTableInDB(BusContract.BusStopsEntry.TABLE_NAME)) {
             new FetchBusStopsTask().execute("Test");
         } else {
             Log.v(TAG, "BUSSTOPS Table already exists.");
         }
 
-        //if(!new BusDBHelper(getBaseContext()).hasTableInDB(BusContract.BusServicesEntry.TABLE_NAME)) {
+        if(!new BusDBHelper(getBaseContext()).hasTableInDB(BusContract.BusRoutesEntry.TABLE_NAME)) {
             new FetchBusRoutesTask().execute("Test");
-        //} else {
-            //Log.v(TAG, "BUSRoutes Table already exists.");
-        //}
-    }
-
-    /*
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        //LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        //mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview_bus_list);
-
-        //mRecyclerView.setHasFixedSize(true);
-
-        //mRecyclerView.setLayoutManager(layoutManager);
-
-        //mBusArrivalAdapter = new BusArrivalAdapter();
-
-        //mRecyclerView.setAdapter(mBusArrivalAdapter);
-
-        //mRecyclerView.setVisibility(View.VISIBLE);
-
-        //mButton = (Button)findViewById(R.id.btn_search);
-
-        //mButton.setOnClickListener(new View.OnClickListener() {
-           // @Override
-            //public void onClick(View view) {
-                //testButton(view);
-            //}
-        //});
-
-        autoCompleteTextView = (BusAutoCompleteTextView)findViewById(R.id.tv_autoCompletBusStops);
-        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence userInput, int start, int before, int count) {
-                MainActivity.this.loadAutoCompleteText(userInput.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-        busStopsArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[] {""});
-        autoCompleteTextView.setAdapter(busStopsArrayAdapter);
-
-        //BusDBHelper busDBHelper = new BusDBHelper(getApplicationContext());
-        //SQLiteDatabase db = busDBHelper.getReadableDatabase();
-        if(!new BusDBHelper(getBaseContext()).hasTableInDB(BusContract.BusStopsEntry.TABLE_NAME)) {
-            new FetchBusStopsTask().execute("Test");
+        } else {
+            Log.v(TAG, "BUSRoutes Table already exists.");
         }
     }
-    */
 
-    /*
-    public void loadAutoCompleteText(String userInput) {
-        Log.v(TAG, "User input: " + userInput);
-        if(userInput == null || userInput.length() == 0) {
-            return;
-        }
-        Uri uri = BusContract.BusStopsEntry.buildBusStopsUri(userInput);
-        ArrayList<String> busStops = new ArrayList<String>();
-        Cursor cursor = getContentResolver().query(uri, BUS_STOPS_PROJECTION, null, null, null);
-        if(cursor.moveToFirst()) {
-            do {
-                busStops.add( cursor.getString(INDEX_BUS_STOP_DESCRIPTION) + " (" + cursor.getString(INDEX_BUS_STOP_CODE) + ")");
-            } while(cursor.moveToNext());
-        }
-        busStopsArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, busStops);
-        autoCompleteTextView.setAdapter(busStopsArrayAdapter);
-        //Log.v(TAG, busStopsArrayAdapter.getItem(0));
-        busStopsArrayAdapter.notifyDataSetChanged();
-    }
-    */
 
     public void loadAutoCompleteSuggestions(String userInput) {
         Log.v(TAG, "User input: " + userInput);
@@ -217,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         //searchView.setSearchableInfo(((SearchManager) getSystemService(Context.SEARCH_SERVICE)).getSearchableInfo(getComponentName()));
         searchAutoComplete.setAdapter(busStopsArrayAdapter);
         Log.v(TAG, "ArrayAdapter Count: " + busStopsArrayAdapter.getCount());
+        cursor.close();
         busStopsArrayAdapter.notifyDataSetChanged();
     }
 
@@ -284,15 +194,15 @@ public class MainActivity extends AppCompatActivity {
                     String jsonApiResponse = BusNetworkUtils.getResponseFromHttpUrl(busRoutesUrl);
                     Log.v(TAG, jsonApiResponse);
 
-                    //rowsInserted = getContentResolver().bulkInsert(BusContract.BusStopsEntry.CONTENT_URI, BusJsonUtils.getBusServicesFromJson(jsonApiResponse));
-                    //Log.v(TAG, "Rows inserted: " + rowsInserted);
-                    //skip += rowsInserted;
+                    rowsInserted = getContentResolver().bulkInsert(BusContract.BusRoutesEntry.CONTENT_URI, BusJsonUtils.getBusRoutesFromJson(jsonApiResponse));
+                    Log.v(TAG, "Rows inserted: " + rowsInserted);
+                    skip += rowsInserted;
                 } catch (IOException ioe) {
                     Log.e(TAG, "Error receiving response: " + busRoutesUrl);
                     return null;
-                //} catch(JSONException jsone) {
-                    //Log.e(TAG, "Error parsing JSON response: " + jsone.getMessage());
-                    //return null;
+                } catch(JSONException jsone) {
+                    Log.e(TAG, "Error parsing JSON response: " + jsone.getMessage());
+                    return null;
                 }
 
             } while(rowsInserted > 0);
@@ -304,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             //super.onPostExecute(s);
             //if(busArrivalDataList != null) {
-            Log.v(TAG, "Reached onPostExecute");
+            Log.v(TAG, "Reached onPostExecute of Bus Routes");
             //mBusArrivalAdapter.setBusArrivalDataList(busArrivalDataList);
             //}
         }
@@ -355,16 +265,16 @@ public class MainActivity extends AppCompatActivity {
                 bundle.clear();
                 bundle.putString(MainActivity.BUS_STOP_CODE, busStopCode);
                 bundle.putString(MainActivity.BUS_STOP_NAME, query);
-                BusListFragment busListFragment = (BusListFragment) busFragmentPagerAdapter.getItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
-                //BusListFragment busListFragment = (BusListFragment) getSupportFragmentManager().findFragmentById(R.id.frame_buslist);
-                //busListFragment.refreshData(bundle);
+                BusArrivalListFragment busArrivalListFragment = (BusArrivalListFragment) busFragmentPagerAdapter.getItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
+                //BusArrivalListFragment busArrivalListFragment = (BusArrivalListFragment) getSupportFragmentManager().findFragmentById(R.id.frame_buslist);
+                //busArrivalListFragment.refreshData(bundle);
                 //busFragmentPagerAdapter.
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                //fragmentTransaction.remove(busListFragment);
-                //busListFragment = new BusListFragment();
-                busListFragment.setArguments(bundle);
+                //fragmentTransaction.remove(busArrivalListFragment);
+                //busArrivalListFragment = new BusArrivalListFragment();
+                busArrivalListFragment.setArguments(bundle);
                 Log.v(TAG, "SET THE BUNDLE!!!");
-                fragmentTransaction.replace(R.id.frame_buslist, busListFragment);
+                fragmentTransaction.replace(R.id.frame_buslist, busArrivalListFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 
@@ -414,16 +324,16 @@ public class MainActivity extends AppCompatActivity {
         bundle.clear();
         bundle.putString(MainActivity.BUS_STOP_CODE, busStopCode);
         bundle.putString(MainActivity.BUS_STOP_NAME, busStopName);
-        BusListFragment busListFragment = (BusListFragment) busFragmentPagerAdapter.getItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
-        //BusListFragment busListFragment = (BusListFragment) getSupportFragmentManager().findFragmentById(R.id.frame_buslist);
-        //busListFragment.refreshData(bundle);
+        BusArrivalListFragment busArrivalListFragment = (BusArrivalListFragment) busFragmentPagerAdapter.getItem(BusFragmentPagerAdapter.INDEX_BUS_LIST);
+        //BusArrivalListFragment busArrivalListFragment = (BusArrivalListFragment) getSupportFragmentManager().findFragmentById(R.id.frame_buslist);
+        //busArrivalListFragment.refreshData(bundle);
         //busFragmentPagerAdapter.
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        //fragmentTransaction.remove(busListFragment);
-        //busListFragment = new BusListFragment();
-        busListFragment.setArguments(bundle);
+        //fragmentTransaction.remove(busArrivalListFragment);
+        //busArrivalListFragment = new BusArrivalListFragment();
+        busArrivalListFragment.setArguments(bundle);
         Log.v(TAG, "SET THE BUNDLE!!!");
-        fragmentTransaction.replace(R.id.frame_buslist, busListFragment);
+        fragmentTransaction.replace(R.id.frame_buslist, busArrivalListFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 

@@ -66,5 +66,31 @@ public class BusContract {
 
     public static final class BusRoutesEntry implements BaseColumns {
 
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_BUSROUTES)
+                .build();
+
+        public static final String TABLE_NAME = "busroutes";
+
+        public static final String COLUMN_SERVICENO = "serviceno";
+        public static final String COLUMN_OPERATOR = "operator";
+        public static final String COLUMN_DIRECTION = "direction";
+        public static final String COLUMN_STOPSEQUENCE = "stopsequence";
+        public static final String COLUMN_BUSSTOPCODE = "busstopcode";
+        public static final String COLUMN_DISTANCE = "distance";
+        public static final String COLUMN_WD_FIRSTBUS = "wd_firstbus";
+        public static final String COLUMN_WD_LASTBUS = "wd_lastbus";
+        public static final String COLUMN_SAT_FIRSTBUS = "sat_firstbus";
+        public static final String COLUMN_SAT_LASTBUS = "sat_lastbus";
+        public static final String COLUMN_SUN_FIRSTBUS = "sun_firstbus";
+        public static final String COLUMN_SUN_LASTBUS = "sun_lastbus";
+
+        public static Uri buildBusRouteSearchUri(String busServiceNo, String busStopCode) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(busServiceNo)
+                    .appendPath(busStopCode)
+                    .build();
+        }
+
     }
 }

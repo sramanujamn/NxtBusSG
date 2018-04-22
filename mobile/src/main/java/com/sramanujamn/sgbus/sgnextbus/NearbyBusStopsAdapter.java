@@ -103,7 +103,7 @@ public class NearbyBusStopsAdapter extends RecyclerView.Adapter<NearbyBusStopsAd
                 MainActivity mainActivity = (MainActivity)view.getContext();
                 mainActivity.loadBusArrivalList(holder.mBusStopTextView.getText().toString(), busStopLocationData.getBusStopCode());
 
-                //BusListFragment busListFragment = new BusListFragment();
+                //BusArrivalListFragment busListFragment = new BusArrivalListFragment();
                 //Bundle args = new Bundle();
                 //args.putString(MainActivity.BUS_STOP_CODE, busStopLocationData.getBusStopCode());
                 //busListFragment.setArguments(args);

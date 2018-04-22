@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 
 public class BusFragmentPagerAdapter extends FragmentPagerAdapter {
 
@@ -29,7 +28,7 @@ public class BusFragmentPagerAdapter extends FragmentPagerAdapter {
             case INDEX_NEARBY_BUSSTOPS:
                 return new NearbyBusStopsFragment();
             case INDEX_BUS_LIST:
-                Fragment fragment = new BusListFragment();
+                Fragment fragment = new BusArrivalListFragment();
                 return fragment;
             case INDEX_BUS_DETAILS:
                 return new BusDetailsFragment();

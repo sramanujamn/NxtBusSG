@@ -57,7 +57,7 @@ public class BusListActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(layoutManager);
 
-        mBusArrivalAdapter = new BusArrivalAdapter();
+        mBusArrivalAdapter = new BusArrivalAdapter("Test");
 
         mRecyclerView.setAdapter(mBusArrivalAdapter);
 
