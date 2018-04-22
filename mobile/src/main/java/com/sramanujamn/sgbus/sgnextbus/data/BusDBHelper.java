@@ -9,7 +9,7 @@ public class BusDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "nextbusg.db";
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public BusDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -45,8 +45,12 @@ public class BusDBHelper extends SQLiteOpenHelper {
                 + BusContract.BusRoutesEntry.COLUMN_SAT_FIRSTBUS + " TEXT NOT NULL, "
                 + BusContract.BusRoutesEntry.COLUMN_SAT_LASTBUS + " TEXT NOT NULL, "
                 + BusContract.BusRoutesEntry.COLUMN_SUN_FIRSTBUS + " TEXT NOT NULL, "
-                + BusContract.BusRoutesEntry.COLUMN_SUN_LASTBUS + " TEXT NOT NULL "
-                + " ON CONFLICT REPLACE"
+                + BusContract.BusRoutesEntry.COLUMN_SUN_LASTBUS + " TEXT NOT NULL, "
+                + " UNIQUE (" + BusContract.BusRoutesEntry.COLUMN_SERVICENO
+                + ", " + BusContract.BusRoutesEntry.COLUMN_BUSSTOPCODE
+                + ", " + BusContract.BusRoutesEntry.COLUMN_DIRECTION
+                + ", " + BusContract.BusRoutesEntry.COLUMN_STOPSEQUENCE
+                + ") ON CONFLICT REPLACE"
                 + ")";
 
         //sqLiteDatabase.execSQL(SQL_CREATE_BUSSTOPS_TABLE);
@@ -56,20 +60,22 @@ public class BusDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusStopsEntry.TABLE_NAME);
-        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusRoutesEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BusContract.BusRoutesEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 
     public boolean hasTableInDB(String tableName) {
-        Cursor cursor = this.getReadableDatabase().query(
-                tableName, null, null, null, null, null, null, "5"
-        );
+        boolean tableExists = false;
+
+        String sqlQuery = "select * from sqlite_master where type = 'table' and name = ?";
+        String[] selectorArgs = new String[] {tableName};
+        Cursor cursor = this.getReadableDatabase().rawQuery(sqlQuery, selectorArgs);
 
         if(cursor.moveToFirst()) {
-            return true;
+            tableExists = true;
         }
         cursor.close();
-        return false;
+        return tableExists;
     }
 
 }

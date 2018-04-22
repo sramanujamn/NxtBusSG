@@ -25,6 +25,10 @@ public class BusJsonUtils {
      */
     private static final String SERVICE_NO = "ServiceNo";
 
+    private static final String LATITUDE = "Latitude";
+
+    private static final String LONGITUDE = "Longitude";
+
 
     /**
      * BUS ARRIVALS
@@ -56,10 +60,6 @@ public class BusJsonUtils {
     private static final String ROAD_NAME = "RoadName";
 
     private static final String BUS_STOP_DESCRIPTION = "Description";
-
-    private static final String BUS_STOP_LATITUDE = "Latitude";
-
-    private static final String BUS_STOP_LONGITUDE = "Longitude";
 
 
     /**
@@ -134,6 +134,10 @@ public class BusJsonUtils {
             if(nextBus.getString(FEATURE).equals(WHEELCHAIR_ACCESSIBLE)) {
                 busArrivalData.setWheelChairAccessible(true);
             }
+            busArrivalData.setLatitude(nextBus.getDouble(LATITUDE));
+            busArrivalData.setLongitude(nextBus.getDouble(LONGITUDE));
+
+
 
             // ADD Details of Second Bus
             JSONObject nextBus2 = busArrival.getJSONObject(NEXT_BUS_2);
@@ -174,8 +178,8 @@ public class BusJsonUtils {
             cv.put(BusContract.BusStopsEntry.COLUMN_BUSSTOPCODE, busStop.getString(BUS_STOP_CODE));
             cv.put(BusContract.BusStopsEntry.COLUMN_ROADNAME, busStop.getString(ROAD_NAME));
             cv.put(BusContract.BusStopsEntry.COLUMN_DESCRIPTION, busStop.getString(BUS_STOP_DESCRIPTION));
-            cv.put(BusContract.BusStopsEntry.COLUMN_LATITUDE, busStop.getDouble(BUS_STOP_LATITUDE));
-            cv.put(BusContract.BusStopsEntry.COLUMN_LONGITUDE, busStop.getDouble(BUS_STOP_LONGITUDE));
+            cv.put(BusContract.BusStopsEntry.COLUMN_LATITUDE, busStop.getDouble(LATITUDE));
+            cv.put(BusContract.BusStopsEntry.COLUMN_LONGITUDE, busStop.getDouble(LONGITUDE));
             contentValues[i] = cv;
         }
 

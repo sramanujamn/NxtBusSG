@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sramanujamn.sgbus.sgnextbus.data.BusRouteData;
@@ -33,6 +34,11 @@ public class BusRoutesAdapter extends RecyclerView.Adapter<BusRoutesAdapter.BusR
         holder.busStopView.setText(busRouteData.getBusStopCode());
         holder.distanceView.setText(busRouteData.getDistance());
         //Log.v(TAG, "BusStopView Text set to: " + busRouteData.getBusStopCode());
+
+        if(position == (getItemCount()-1)) {
+            ImageView imgView = (ImageView) holder.itemView.findViewById(R.id.iv_vertical_connector);
+            imgView.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

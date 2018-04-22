@@ -73,6 +73,9 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         //private ConstraintLayout busExpandedLayout;
         private RecyclerView busRouteRecyclerView;
 
+        private double latitude;
+        private double longitude;
+
 
         public BusArrivalAdapterViewHolder(View view) {
             super(view);
@@ -89,30 +92,13 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
             busRouteRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_nested_busroutes_list);
             //busExpandedLayout.setVisibility(View.GONE);
             busRouteRecyclerView.setVisibility(View.GONE);
-            //int baseline = dividerView.getBaseline();
 
-            //Context context = view.getContext();
-            //LayoutInflater inflater = LayoutInflater.from(context);
-            //boolean shouldAttachToParentImmediately = false;
-            //View rootView = holder.itemView.getRootView();
-            //View rootView = holder.busExpandedLayout.getRootView();
-            //View rootView = inflater.inflate(R.layout.rv_busroutes_list, (ViewGroup) view.getParent(), shouldAttachToParentImmediately);
             LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false);
-            //busRouteRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_busroutes_list);
-            //RecyclerView mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_busroutes_list);
 
             busRouteRecyclerView.setHasFixedSize(true);
-
             busRouteRecyclerView.setLayoutManager(layoutManager);
-
-            //BusRoutesAdapter busRoutesAdapter = new BusRoutesAdapter();
-            //busRoutesAdapter.setBusRouteDataList(busRouteData);
-
-            //busRouteRecyclerView.setAdapter(busRoutesAdapter);
-
-            //busRouteRecyclerView.setVisibility(View.VISIBLE);
             busRouteRecyclerView.setNestedScrollingEnabled(true);
-            //busRoutesAdapter.notifyDataSetChanged();
+
         }
 
     }
@@ -184,6 +170,9 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         } else {
             holder.itemView.setPadding(0,0,0,0);
         }
+
+        holder.latitude = busArrivalData.getLatitude();
+        holder.longitude = busArrivalData.getLongitude();
     }
 
     @Override
@@ -214,35 +203,12 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
             } while(cursor.moveToNext());
         }
         cursor.close();
+        cursor = null;
         BusRouteData[] busRouteData = new BusRouteData[busRouteDataList.size()];
         for(int i = 0; i < busRouteDataList.size(); i++) {
             busRouteData[i] = busRouteDataList.get(i);
             //Log.v(TAG, "Bus Stops: " + busRouteData[i].getBusStopCode());
         }
-
-        /*Context context = holder.itemView.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
-        boolean shouldAttachToParentImmediately = false;
-        //View rootView = holder.itemView.getRootView();
-        //View rootView = holder.busExpandedLayout.getRootView();
-        View rootView = inflater.inflate(R.layout.rv_busroutes_list, (ViewGroup) holder.itemView.getParent(), shouldAttachToParentImmediately);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
-        RecyclerView mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_busroutes_list);
-
-        mRecyclerView.setHasFixedSize(true);
-
-        mRecyclerView.setLayoutManager(layoutManager);
-
-        BusRoutesAdapter busRoutesAdapter = new BusRoutesAdapter();
-        busRoutesAdapter.setBusRouteDataList(busRouteData);
-
-        mRecyclerView.setAdapter(busRoutesAdapter);
-
-        mRecyclerView.setVisibility(View.VISIBLE);
-        mRecyclerView.setNestedScrollingEnabled(true);
-        busRoutesAdapter.notifyDataSetChanged();
-        */
 
         BusRoutesAdapter busRoutesAdapter = new BusRoutesAdapter();
         busRoutesAdapter.setBusRouteDataList(busRouteData);
