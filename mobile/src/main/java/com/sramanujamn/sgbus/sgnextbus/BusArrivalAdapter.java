@@ -217,7 +217,7 @@ public class BusArrivalAdapter extends RecyclerView.Adapter<BusArrivalAdapter.Bu
         BusRouteData[] busRouteData = new BusRouteData[busRouteDataList.size()];
         for(int i = 0; i < busRouteDataList.size(); i++) {
             busRouteData[i] = busRouteDataList.get(i);
-            Log.v(TAG, "Bus Stops: " + busRouteData[i].getBusStopCode());
+            //Log.v(TAG, "Bus Stops: " + busRouteData[i].getBusStopCode());
         }
 
         /*Context context = holder.itemView.getContext();
